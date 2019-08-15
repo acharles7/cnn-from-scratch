@@ -15,11 +15,11 @@ void im2col::convolution(vector<int> input, vector<int> filter, int input_size, 
     int const convAh = input_size*input_size;
     
     vector<int> convElements(convAw*convAh);
-    
     vector<int> ans;
+    
     for (int i = 0; i < outm; i++){
-        vector<vector<int>> col;
         for (int j = 0; j < outm; j++){
+            
             vector<int> rw(convAw);
             int wh = i * outm * convAw + j * convAw;
             
@@ -64,7 +64,7 @@ void im2col::convolution(vector<int> input, vector<int> filter, int input_size, 
     }
 
     
-    cout << "Matrix:" << endl;
+    cout << "Output Matrix:" << endl;
     for (int i = 0; i < outm; i++){
         for (int j = 0; j < outm; j++){
             cout << ans[i*outm + j] <<" ";

@@ -169,8 +169,7 @@ vector<vector<vector<float>>> zeroPad(const vector<vector<vector<float>>> &in,
     return out;
 }
 
-vector<float>
-flatten(const vector<vector<vector<float>>> &in){
+vector<float> flatten(const vector<vector<vector<float>>> &in){
     size_t height = in.size();
     if (height < 1) {
         throw runtime_error("Input too small in flatten");
@@ -240,11 +239,6 @@ vector<float> dense(const vector<float> &in, const vector<vector<float> > &weigh
     return out;
 }
 
-// "activation" is an overloaded function name, as our representation
-// of tensors awkwardly means we can't straightforwardly operate on
-// both rank-1 and rank-3 tensors in the same function. This version
-// is for rank-3 tensors as returned from convolution layers
-//
 vector<vector<vector<float>>> activation(const vector<vector<vector<float>>> &in,string type){
     auto out(in);
     
@@ -258,18 +252,14 @@ vector<vector<vector<float>>> activation(const vector<vector<vector<float>>> &in
                 }
             }
         }
-    } else {
+    }
+    else {
         throw runtime_error("Unknown activation function '" + type + "'");
     }
     
     return out;
 }
 
-// "activation" is an overloaded function name, as our representation
-// of tensors awkwardly means we can't straightforwardly operate on
-// both rank-1 and rank-3 tensors in the same function. This version
-// is for rank-1 tensors as returned from dense layers
-//
 vector<float> activation(const vector<float> &in, string type){
     auto out(in);
     size_t sz = out.size();
@@ -374,17 +364,7 @@ vector<vector<float>> read_image(string filename){
             image_tensor_bw[i].push_back(*ptr++);
         }
     }
-//    cout<<image_tensor_color.size()<<endl;
-//    for(auto a: image_tensor_color){
-//        for(auto b: a){
-//            for(auto c: b){
-//                cout<<c<<" ";
-//            }
-//            cout<<endl;
-//        }
-//        cout<<endl;
-////        cout<<a.size()<<endl;
-//    }
+
     return image_tensor_bw;
 }
 
@@ -449,15 +429,14 @@ vector<vector<float>> read_image(string filename){
 
 
 
-
 int main(int argc, char **argv){
     
     im2col im;
 
-    int const input_size = 128;
+    int const input_size = 5;
 
     
-    auto image = read_image("/Users/lomesh/Documents/bco.png");
+    auto image = read_image("/Users/lomesh/Documents/Xcode/Cnn/bco.png");
     vector<int> inputImage;
     
     for(auto a: image){
@@ -481,7 +460,7 @@ int main(int argc, char **argv){
         1, 1, 1
     };
 
-    im.convolution(inputImage, filter, input_size, filter_size);
+    im.convolution(input, filter, input_size, filter_size);
 
 
     

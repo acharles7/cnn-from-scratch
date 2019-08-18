@@ -17,7 +17,9 @@ using namespace std;
 
 class im2col{
 public:
-    void convolution(vector<int> input, vector<int> filter, int input_size, int filter_size);
+    vector<vector<float>> convolutionSimple(vector<int> input, vector<int> filter, int input_size, int filter_size);
+    void convolutionVector(vector<int> input, vector<int> filter, int input_size, int filter_size);
+    void convolutionExperiment();
     
     
 };

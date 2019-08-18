@@ -337,7 +337,7 @@ vector<vector<float>> read_image(string filename){
     
 //    image.format = PNG_FORMAT_RGB;
     image.format = PNG_FORMAT_GRAY;
-    auto size = image.width * image.height * 3;
+    auto size = image.width * image.height * 1;
     vector<png_byte> buffer(size);
     
     if (!png_image_finish_read(&image, nullptr, buffer.data(), 0, nullptr)) {
@@ -429,44 +429,63 @@ vector<vector<float>> read_image(string filename){
 
 
 
+
 int main(int argc, char **argv){
     
     im2col im;
-
-    int const input_size = 5;
-
     
-    auto image = read_image("/Users/lomesh/Documents/Xcode/Cnn/bco.png");
-    vector<int> inputImage;
+//    auto image = read_image("/Users/lomesh/Documents/colour.png");
     
-    for(auto a: image){
-        for (auto b: a) {
-            inputImage.push_back(b);
-        }
-    }
+    int const input_size = 3;
     
     vector<int> input = {
-        1, 2, 3, 4, 5,
-        6, 7, 8, 9, 10,
-        11, 12, 13, 14, 15,
-        16, 17, 18, 19, 20,
-        21, 22, 23, 24, 25
+        1, 2, 3,
+        4, 5, 6,
+        7, 8, 9
+//        1, 2, 3, 4, 5,
+//        6, 7, 8, 9, 10,
+//        11, 12, 13, 14, 15,
+//        16, 17, 18, 19, 20,
+//        21, 22, 23, 24, 25
     };
 
-    int const filter_size = 3;
-    vector<int> filter = {
-        1, 1, 1,
-        1, 1, 1,
-        1, 1, 1
-    };
+    
+    vector<int> inputImage;
+    
+//    for(auto a: image){
+//        for (auto b: a) {
+//            inputImage.push_back(b);
+//        }
+//    }
+    vector<int> filter = { 1, 1, 1, 1 };
 
-    im.convolution(input, filter, input_size, filter_size);
+    int const filter_size = 2;
+    
+    
+    vector<vector<float>> features = im.convolutionSimple(input, filter, input_size, filter_size);
+     
+//    for(int i = 0; i <  )
 
-
+//    auto ts1 = std::chrono::high_resolution_clock::now();
+//    im.convolutionSimple(inputImage, filter, input_size, filter_size);
+//    auto te1 = std::chrono::high_resolution_clock::now();
+//    double elaspedTimeMs1 = std::chrono::duration<double, std::milli>(te1-ts1).count();
+//    cout<<"Normal Time: "<<elaspedTimeMs1/(double)1000<<" Sec  ||";
+//    cout<<endl;
+//
+//    auto ts2 = std::chrono::high_resolution_clock::now();
+//    im.convolutionVector(inputImage, filter, input_size, filter_size);
+//    auto te2 = std::chrono::high_resolution_clock::now();
+//    double elaspedTimeMs2 = std::chrono::duration<double, std::milli>(te2-ts2).count();
+//    cout<<"Vector Time: "<<elaspedTimeMs2/(double)1000<<" Sec  ||";
+//    cout<<endl;
+    
+    
+    
+    
     
 
-    
-    
+
 //    for(int i = 30; i < 31; i++){
 //        cout<<image[i].size()<<endl;
 //        for(int j = 0; j < image[0].size(); j++){

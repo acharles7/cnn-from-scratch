@@ -8,6 +8,55 @@
 
 #include "im2col.hpp"
 
+inline bool is_a_ge_zero_and_a_lt_b(int a, int b) {
+    return static_cast<unsigned>(a) < static_cast<unsigned>(b);
+}
+
+
+
+void im2col::im2col_cpu(const int* data_im, const int channels,
+                const int height, const int width, const int kernel_h, const int kernel_w,
+                const int pad_h, const int pad_w,
+                const int stride_h, const int stride_w,
+                const int dilation_h, const int dilation_w,
+                int* data_col) {
+    const int output_h = (height + 2 * pad_h -
+                          (dilation_h * (kernel_h - 1) + 1)) / stride_h + 1;
+    const int output_w = (width + 2 * pad_w -
+                          (dilation_w * (kernel_w - 1) + 1)) / stride_w + 1;
+    const int channel_size = height * width;
+    
+    for (int channel = channels; channel--; data_im += channel_size) {
+        for (int kernel_row = 0; kernel_row < kernel_h; kernel_row++) {
+            for (int kernel_col = 0; kernel_col < kernel_w; kernel_col++) {
+                int input_row = -pad_h + kernel_row * dilation_h;
+                for (int output_rows = output_h; output_rows; output_rows--) {
+                    if (!is_a_ge_zero_and_a_lt_b(input_row, height)) {
+                        for (int output_cols = output_w; output_cols; output_cols--) {
+                            *(data_col++) = 0;
+                        }
+                    }
+                    else {
+                        int input_col = -pad_w + kernel_col * dilation_w;
+                        for (int output_col = output_w; output_col; output_col--) {
+                            if (is_a_ge_zero_and_a_lt_b(input_col, width)) {
+                                *(data_col++) = data_im[input_row * width + input_col];
+                            }
+                            else {
+                                *(data_col++) = 0;
+                            }
+                            input_col += stride_w;
+                        }
+                    }
+                    input_row += stride_h;
+                }
+            }
+        }
+    }
+}
+
+
+
 vector<vector<float>> im2col::convolutionSimple(vector<int> input, vector<int> filter, int input_size, int filter_size){
     
     int const outm = input_size - filter_size + 1;
@@ -55,29 +104,89 @@ vector<vector<float>> im2col::convolutionSimple(vector<int> input, vector<int> f
     }
     cout<<endl;
     
-    vector<vector<float>> features(filters.size(), std::vector<float>(ans[0].size()));
-    
-    cout<<"Output Matrix"<<endl;
-    
-    for(int row = 0; row < features.size(); ++row) {
-        for(int col = 0; col < features.at(0).size(); ++col) {
-            for(int k = 0; k < ans.size(); k++) {
-                features[row][col] += filters[row][k] * ans[k][col];
-            }
-        }
-    }
-    
-    cout << "Convolve Matrix" << endl;
-    for (int i = 0; i < features.size(); i++){
-        for (int j = 0; j < features[0].size(); j++){
-            cout << features[i][j] <<" ";
-        }
-        cout<<endl;
-    }
-    cout<<endl;
+    vector<vector<float>> features(filters.size(), vector<float>(ans.size()));
+//
+//    cout<<"Output Matrix"<<endl;
+//
+//    for(int row = 0; row < features.size(); ++row) {//3
+//        for(int col = 0; col < features[0].size(); ++col) {//16
+//            for(int k = 0; k < filters[0].size(); k++) {//4
+//                features[row][col] += filters[row][k] * ans[col][k];
+//            }
+//        }
+//    }
+//
+//    cout << "Convolve Matrix" << endl;
+//    for (int i = 0; i < features.size(); i++){
+//        for (int j = 0; j < features[0].size(); j++){
+//            cout << features[i][j] <<" ";
+//        }
+//        cout<<endl;
+//    }
+//    cout<<endl;
     
     return features;
 }
+
+vector<vector<float>> im2col::featureMapConvReshape(vector<vector<float>> input, int filter_size){
+    vector<vector<float>> output;
+    
+    for(int i = 0; i < input.size(); i++){
+
+        int size = (input[i].size() - 1) / filter_size + 1;
+        std::vector<float> vec[size];
+        
+        for (int k = 0; k < size; ++k)
+        {
+
+            auto start_itr = std::next(input[i].cbegin(), k*filter_size);
+            auto end_itr = std::next(input[i].cbegin(), k*filter_size + filter_size);
+            
+            // allocate memory for the sub-vector
+            vec[k].resize(filter_size);
+    
+            if (k*filter_size + filter_size > input[i].size()) {
+                end_itr = input[i].cend();
+                vec[k].resize(input[i].size() - k*filter_size);
+            }
+            
+            // copy elements from the input range to the sub-vector
+            std::copy(start_itr, end_itr, vec[k].begin());
+        }
+
+        for (int i = 0; i < size; i++) {
+            vector<float> ele;
+            for (auto &j: vec[i]){
+//                std::cout << j <<" ";
+                ele.push_back(j);
+            }
+            output.push_back(ele);
+//            std::cout << '\n';
+        }
+        
+        
+    }
+    vector<int> res;
+    for(int i = 0; i < output[0].size(); i++){
+        for(int j = 0; j < output.size(); j++){
+            res.push_back(output[j][i]);
+        }
+    }
+    vector<int> filter = { 1, 1, 1, 1 };
+    
+    vector<vector<float>> features = convolutionSimple(res, filter, 9, 2);
+    
+//    for(auto a: res){
+//        cout<<a<<" ";
+//    }
+    
+    
+    return output;
+}
+
+
+
+
 
 
 void im2col::convolutionVector(vector<int> input, vector<int> filter, int input_size, int filter_size){

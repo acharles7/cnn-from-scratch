@@ -449,7 +449,16 @@ int main(int argc, char **argv){
 //        21, 22, 23, 24, 25
     };
 
-    
+//    int datacol[1000];
+//    int dataim[] = {
+//        1,2,3,4,5,
+//        6,7,8,9,10,
+//        5,4,3,2,1,
+//        10,9,8,7,6,
+//        4,3,2,1,5,
+//    };
+
+
     vector<int> inputImage;
     
 //    for(auto a: image){
@@ -457,13 +466,23 @@ int main(int argc, char **argv){
 //            inputImage.push_back(b);
 //        }
 //    }
+    
     vector<int> filter = { 1, 1, 1, 1 };
-
     int const filter_size = 2;
+//    im.im2col_cpu(dataim, 1, 6, 6, 3, 3, 0, 0, 1, 1, 1, 1, datacol);
+    
+//    vector<vector<float>> features = im.convolutionSimple(input, filter, input_size, filter_size);
+    
+    vector<float> f1 = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    vector<float> f2 = {2, 3, 4, 5, 6, 7, 8, 9, 1};
+    vector<float> f3 = {3, 4, 5, 6, 7, 8, 9, 1, 2};
+    vector<vector<float>> features = {f1, f2, f3};
+    
+    vector<vector<float>> featureReshape = im.featureMapConvReshape(features, 3);
     
     
-    vector<vector<float>> features = im.convolutionSimple(input, filter, input_size, filter_size);
-     
+    
+    
 //    for(int i = 0; i <  )
 
 //    auto ts1 = std::chrono::high_resolution_clock::now();

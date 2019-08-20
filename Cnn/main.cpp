@@ -326,47 +326,7 @@ vector<float> classify(const vector<vector<vector<float>>> &image){
 // Read an image from a PNG file, using libpng, into a tensor in
 // format HWC (height-width-channels)
 
-vector<vector<float>> read_image(string filename){
-    png_image image;
-    memset(&image, 0, sizeof(image));
-    image.version = PNG_IMAGE_VERSION;
-    
-    if (!png_image_begin_read_from_file(&image, filename.c_str())) {
-        throw runtime_error(string("Failed to open image file: ") + image.message);
-    }
-    
-//    image.format = PNG_FORMAT_RGB;
-    image.format = PNG_FORMAT_GRAY;
-    auto size = image.width * image.height * 1;
-    vector<png_byte> buffer(size);
-    
-    if (!png_image_finish_read(&image, nullptr, buffer.data(), 0, nullptr)) {
-        throw runtime_error
-        (string("Failed to read image file: ") + image.message);
-    }
-    
-//    vector<vector<vector<float>>> image_tensor_color;
-    vector<vector<float>> image_tensor_bw;
-    auto ptr = buffer.begin();
-    
-//    for (png_uint_32 i = 0; i < image.height; ++i) {
-//        image_tensor_color.push_back(vector<vector<float>>());
-//        for (png_uint_32 j = 0; j < image.width; ++j) {
-//            image_tensor_color[i].push_back(vector<float>());
-//            for (png_uint_32 k = 0; k < 3; ++k) {
-//                image_tensor_color[i][j].push_back(*ptr++);
-//            }
-//        }
-//    }
-    for (png_uint_32 i = 0; i < image.height; ++i) {
-        image_tensor_bw.push_back(vector<float>());
-        for (png_uint_32 j = 0; j < image.width; ++j) {
-            image_tensor_bw[i].push_back(*ptr++);
-        }
-    }
 
-    return image_tensor_bw;
-}
 
 //vector<vector<float>> convolveBW(const vector<vector<float>> &in,
 //                                       const vector<vector<vector<vector<float>>>> &weights,
@@ -434,55 +394,41 @@ int main(int argc, char **argv){
     
     im2col im;
     
-//    auto image = read_image("/Users/lomesh/Documents/colour.png");
-    
-    int const input_size = 3;
-    
-    vector<int> input = {
-        1, 2, 3,
-        4, 5, 6,
-        7, 8, 9
-//        1, 2, 3, 4, 5,
-//        6, 7, 8, 9, 10,
-//        11, 12, 13, 14, 15,
-//        16, 17, 18, 19, 20,
-//        21, 22, 23, 24, 25
-    };
+//    auto image = im.read_image("/Users/lomesh/Documents/Xcode/Cnn/bco.png");
 
-//    int datacol[1000];
-//    int dataim[] = {
-//        1,2,3,4,5,
-//        6,7,8,9,10,
-//        5,4,3,2,1,
-//        10,9,8,7,6,
-//        4,3,2,1,5,
-//    };
-
-
-    vector<int> inputImage;
-    
+//    vector<int> inputImage;
+//
 //    for(auto a: image){
 //        for (auto b: a) {
 //            inputImage.push_back(b);
 //        }
 //    }
+    int const input_size = 5;
+    vector<int> input = {
+        1, 2, 3, 4, 5,
+        6, 7, 8, 9, 10,
+        11, 12, 13, 14, 15,
+        16, 17, 18, 19, 20,
+        21, 22, 23, 24, 25
+    };
     
-    vector<int> filter = { 1, 1, 1, 1 };
-    int const filter_size = 2;
-//    im.im2col_cpu(dataim, 1, 6, 6, 3, 3, 0, 0, 1, 1, 1, 1, datacol);
+    vector<int> filter = { 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+    int const filter_size = 3;
+
+    im.convolutionExperiment();
     
-//    vector<vector<float>> features = im.convolutionSimple(input, filter, input_size, filter_size);
+//    vector<vector<float>> features = im.convolutionVectorized(inputImage, filter, input_size, filter_size);
+//    im.convolutionVector(inputImage, filter, input_size, filter_size);
     
-    vector<float> f1 = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-    vector<float> f2 = {2, 3, 4, 5, 6, 7, 8, 9, 1};
-    vector<float> f3 = {3, 4, 5, 6, 7, 8, 9, 1, 2};
-    vector<vector<float>> features = {f1, f2, f3};
+
     
-    vector<vector<float>> featureReshape = im.featureMapConvReshape(features, 3);
+//    vector<float> f1 = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+//    vector<float> f2 = {2, 3, 4, 5, 6, 7, 8, 9, 1};
+//    vector<float> f3 = {3, 4, 5, 6, 7, 8, 9, 1, 2};
+//    vector<vector<float>> features = {f1, f2, f3};
     
-    
-    
-    
+//    vector<vector<float>> featureReshape = im.featureMapConvReshape(features, 3);
+
 //    for(int i = 0; i <  )
 
 //    auto ts1 = std::chrono::high_resolution_clock::now();
@@ -498,12 +444,6 @@ int main(int argc, char **argv){
 //    double elaspedTimeMs2 = std::chrono::duration<double, std::milli>(te2-ts2).count();
 //    cout<<"Vector Time: "<<elaspedTimeMs2/(double)1000<<" Sec  ||";
 //    cout<<endl;
-    
-    
-    
-    
-    
-
 
 //    for(int i = 30; i < 31; i++){
 //        cout<<image[i].size()<<endl;
